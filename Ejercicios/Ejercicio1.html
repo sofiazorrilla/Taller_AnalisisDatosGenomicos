@@ -21,6 +21,69 @@ width: 0.8em;
 margin: 0 0.8em 0.2em -1.6em;
 vertical-align: middle;
 }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
 </style>
 
 
@@ -2566,23 +2629,136 @@ vertical-align: -.125em;
 
 </header>
 
+<section id="instalar-miniconda-en-su-usuario" class="level2">
+<h2 class="anchored" data-anchor-id="instalar-miniconda-en-su-usuario">Instalar miniconda en su usuario</h2>
+</section>
 <section id="demultiplex" class="level2">
 <h2 class="anchored" data-anchor-id="demultiplex">Demultiplex</h2>
+<section id="process_radtags" class="level3">
+<h3 class="anchored" data-anchor-id="process_radtags">process_radtags</h3>
+<p>STACKS tool process_radtags which:</p>
+<blockquote class="blockquote">
+<p>… checks that the barcode and the RAD cutsite are intact, and demultiplexes the data. If there are errors in the barcode or the RAD site within a certain allowance process_radtags can correct them. Second, it slides a window down the length of the read and checks the average quality score within the window. If the score drops below 90% probability of being correct (a raw phred score of 10), the read is discarded. This allows for some seqeuncing errors while elimating reads where the sequence is degrading as it is being sequenced.</p>
+</blockquote>
+<ul>
+<li><a href="https://catchenlab.life.illinois.edu/stacks/comp/process_radtags.php">Manual</a></li>
+<li>script: <code>process_radtags.sh</code></li>
+</ul>
+<p>Parameters: - <code>-p</code> we indicate the directory with the sequence data - <code>-i</code> the type of sequence file - <code>-o</code> the output directory - <code>-y</code> the output format - <code>-b</code> the barcode file to use for demultiplexing - <code>-e</code> the restriction enzyme so it knows what cut site sequence to expect after the barcode - <code>--adapter_1</code> to indicate the adapter sequence to identify and remove contaminants - <code>--adapter_mm</code> the number of mismatches allowed between the read and real adapter sequence - <code>-r</code> to “rescue” (keep) a sequence if there is one error in the barcode - <code>-c</code> to remove reads with uncalled bases (N) - <code>-q</code> to discard reads with low quality scores which are defined by a sliding window if the average score is less than <code>-s</code> = 10.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="va">input_dir</span><span class="op">=</span>../data/raw_data/batch_01846</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="va">barcodes_file</span><span class="op">=</span>../data/barcodes/barcodes_01846.txt</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co">#mkdir ../data/demultiplexed_raw2/batch_01846</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="ex">process_radtags</span> <span class="at">-t</span> 18 <span class="dt">\ </span># número de núcleos</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>                <span class="ex">-p</span> <span class="va">$input_dir</span> <span class="dt">\</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>                <span class="at">-i</span> gzfastq <span class="dt">\</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>                <span class="at">-o</span> ../data/demultiplexed_raw2/batch_01846 <span class="dt">\</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>                <span class="at">-b</span> <span class="va">$barcodes_file</span> <span class="dt">\</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>                <span class="at">--renz_1</span> pstI <span class="dt">\ </span># enzima de restricción</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>                <span class="ex">-r</span> <span class="at">-c</span> <span class="dt">\</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>                <span class="at">--barcode-dist-1</span> 2 <span class="dt">\ </span># numero de discrepancias en el barcode</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>                <span class="ex">-D</span> <span class="dt">\</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>                <span class="op">&amp;&gt;</span>out_demultiplex_01846.log <span class="co"># una forma de guardar lo que se imprime en pantalla </span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
 </section>
 <section id="revisión-de-calidad" class="level2">
 <h2 class="anchored" data-anchor-id="revisión-de-calidad">Revisión de calidad</h2>
 <section id="fastq" class="level3">
 <h3 class="anchored" data-anchor-id="fastq">FastQ</h3>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="va">files</span><span class="op">=</span><span class="va">$(</span><span class="fu">ls</span> <span class="at">-d</span> ../data/raw_data/morton_data/<span class="pp">*</span>.gz<span class="va">)</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> file <span class="kw">in</span> <span class="va">$files</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="cf">do</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="ex">fastqc</span> <span class="va">$file</span> <span class="at">-o</span> ../outputs/fastqc/morton_data/</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="cf">done</span>    </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section id="fastqc" class="level3">
 <h3 class="anchored" data-anchor-id="fastqc">FastQC</h3>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="va">files</span><span class="op">=</span><span class="va">$(</span><span class="fu">ls</span> <span class="at">-d</span> ../data/raw_data/morton_data/<span class="pp">*</span>.gz<span class="va">)</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="ex">fastq_screen</span> <span class="at">--threads</span> 10 <span class="at">--aligner</span> bowtie2 <span class="at">--conf</span> fastq_screen.conf <span class="va">$files</span> <span class="at">--outdir</span> ../outputs/fastq_screen/morton_data/</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section id="multiqc---resumen-general" class="level3">
 <h3 class="anchored" data-anchor-id="multiqc---resumen-general">MultiQC - Resumen general</h3>
+<div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co">## Directories</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co">#fastqc=&quot;../outputs/fastqc/batch_01846/&quot;</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="va">fastqc</span><span class="op">=</span><span class="st">&quot;../outputs/fastqc/morton_data/&quot;</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="co">#fastq_screen=&quot;../outputs/fastq_screen/batch_01846/&quot;</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="va">fastq_screen</span><span class="op">=</span><span class="st">&quot;../outputs/fastq_screen/morton_data/&quot;</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="co">## Command</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="ex">multiqc</span> <span class="at">--force</span> <span class="at">--interactive</span> <span class="va">$fastqc</span> <span class="va">$fastq_screen</span> <span class="at">--outdir</span> ../outputs/multiqc/morton_data/ </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 </section>
 <section id="mapeo-a-un-genoma-de-referencia" class="level2">
 <h2 class="anchored" data-anchor-id="mapeo-a-un-genoma-de-referencia">Mapeo a un genoma de referencia</h2>
+<p>After initial quality and contamination assesment. Next step is to performe an aligment to a reference genome (in case there is one available, otherwise a <em>de Novo</em> aligment and variant callig pipeline has to be used). Further trimming and quality chechs can be evaluated by looking at their effect on the mapping statistics.</p>
+<p>First the reference genome has to be downloaded. See <a href="./genome_ncbi_download.md">genome_ncbi_download.md</a> for short instructions. The reference needs to be in a fasta format (.fna is fasta format when sequences are downloaded form NCBI).</p>
+<hr>
+<section id="instructions-for-simple-genome-download-from-ncbi" class="level4">
+<h4 class="anchored" data-anchor-id="instructions-for-simple-genome-download-from-ncbi">Instructions for simple genome download from NCBI</h4>
+<p>In the NCBI website reference genomes are refered as assemblies (representation of genomes). Assemblies is a database in the site where genomes can be looked for.</p>
+<p>There are 2 options to download ncbi genomes (both use a FTP connection) through rsync commands or wget/curl commands. There is a short <a href="https://www.youtube.com/watch?v=-X0H024ST8k&amp;ab_channel=TheNationalLibraryofMedicine">tutorial</a> and documentation in the <a href="https://www.ncbi.nlm.nih.gov/genome/doc/ftpfaq/">FTP QA</a></p>
+<section id="small-number-of-genomes-to-be-downloaded---rsync" class="level5">
+<h5 class="anchored" data-anchor-id="small-number-of-genomes-to-be-downloaded---rsync">Small number of genomes to be downloaded - rsync</h5>
+<p>The FTP path can be obtained by first looking up the species of interes in the NCBI Assembly database, click on the record and on the right side panel there is an option for FTP directories. Once you get the FTP path it can be inserted in the rsync command.</p>
+<p>Replace the “ftp:” at the beginning of the FTP path with “rsync:”. The directory and its contents could be downloaded using the following rsync command:</p>
+<p><code>rsync --copy-links --recursive --times --verbose rsync://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/001/633/185/GCF_001633185.2_ValleyOak3.2/</code></p>
+<hr>
+<p>Then the reference genome has to be indexed. This basically means that we can create a system to do queries more efficient. To uderstand more deeply <a href="https://www.youtube.com/watch?v=5G2Db41pSHE&amp;list=PL2mpR0RYFQsADmYpW2YWBrXJZ_6EL_3nu&amp;index=1&amp;ab_channel=BenLangmead">Lectures</a>.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># index reference genomes to use fastq_screen</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> ../data/genomes/</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="va">paths</span><span class="op">=</span><span class="va">$(</span><span class="fu">ls</span> <span class="at">-d</span> <span class="va">$PWD</span>/<span class="pp">*</span><span class="va">)</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="va">$paths</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="cf">do</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="va">file</span><span class="op">=</span><span class="va">$(</span><span class="fu">ls</span> <span class="at">-d</span> <span class="va">$i</span>/<span class="pp">*</span>.fna.gz<span class="va">)</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="va">name</span><span class="op">=</span><span class="va">$(</span><span class="fu">ls</span> <span class="va">$i</span>/<span class="pp">*</span>.fna.gz <span class="kw">|</span> <span class="fu">cut</span> <span class="at">-d</span> . <span class="at">-f</span> 1-2<span class="va">)</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> <span class="va">$i</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="ex">bowtie2-build</span> <span class="va">$file</span> <span class="va">$name</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="cf">done</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>After that we can use one of the bwa algorithms to map short sequences into our reference.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co">## Align to reference genome (Q.lobata) using BWA-MEM</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co">######### read group file suffix</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="co">#file_suffix=&quot;01846&quot;</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="va">file_suffix</span><span class="op">=</span><span class="st">&quot;morton_data2&quot;</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="co">#file_suffix=&quot;all.90&quot;</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="co">######### input data directory</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="co">#folder_data=&quot;../data/demultiplexed_raw2/all.90bp&quot;</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="va">folder_data</span><span class="op">=</span><span class="st">&quot;../data/raw_data/morton_data/set2/&quot;</span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a><span class="co">######### output directories</span></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a><span class="va">out_folder</span><span class="op">=</span><span class="st">&quot;morton_data2&quot;</span></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> <span class="at">-p</span> ../data/alignment/sam/<span class="va">$out_folder</span></span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> <span class="at">-p</span> ../data/alignment/bam/<span class="va">$out_folder</span></span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a><span class="cf">while</span> <span class="bu">read</span> <span class="va">sample</span> <span class="va">readgroup</span></span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a><span class="cf">do</span></span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&quot;bwa mem -M -t 18 -R </span><span class="va">${readgroup}</span><span class="st"> ../data/genomes/qlobata/GCA_001633185.5_ValleyOak3.2_genomic.fna </span><span class="va">${folder_data}</span><span class="st">/</span><span class="va">${sample}</span><span class="st">.fastq.gz &gt; ../data/alignment/sam/</span><span class="va">${out_folder}</span><span class="st">/</span><span class="va">${sample}</span><span class="st">.sam&quot;</span> <span class="kw">|</span> <span class="fu">bash</span></span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a><span class="ex">picard</span> SortSam I=../data/alignment/sam/<span class="va">${out_folder}</span>/<span class="va">${sample}</span>.sam O=../data/alignment/bam/<span class="va">${out_folder}</span>/<span class="va">${sample}</span>.bam SORT_ORDER=coordinate</span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a><span class="ex">samtools</span> index ../data/alignment/bam/<span class="va">${out_folder}</span>/<span class="va">${sample}</span>.bam</span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a><span class="cf">done</span> <span class="op">&lt;</span> ../data/readgroups/sampl_rgp_<span class="va">${file_suffix}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+</section>
 </section>
 <section id="llamado-de-snps" class="level2">
 <h2 class="anchored" data-anchor-id="llamado-de-snps">Llamado de SNPs</h2>
