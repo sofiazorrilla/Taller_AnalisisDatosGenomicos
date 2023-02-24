@@ -16,3 +16,10 @@ Taller de introducción a análisis de datos con datos genómicos para el semina
   - pegas?
   - ADMIXTURE
   - SambaR?
+
+## Recursos
+
+**Git con Rstudio**
+
+[Aquí](http://destio.us.es/calvo/asignaturas/ge_esco/tutorialusargitgithubrstudio/UsarGitGithubconRStudio.html) hay un tutorial del flujo de trabajo con git y Rstudio. Además tiene una explicación breve de git en general. 
+
