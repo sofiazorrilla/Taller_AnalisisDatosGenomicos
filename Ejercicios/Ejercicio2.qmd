@@ -2,6 +2,7 @@
 title: "Procesamiento de VCF: Filtros básicos"
 format: html
 author: "Sergio y Sofía"
+self-contained: true
 ---
 
 ## Filtros con vcftools
