@@ -1,0 +1,14 @@
+---
+title: "Procesamiento de VCF: Filtros básicos"
+format: html
+author: "Sergio y Sofía"
+---
+
+## Filtros con vcftools
+
+
+## Filtros con SNPFiltR
+
+
+## Filtros con Plink
+

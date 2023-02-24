@@ -1,0 +1,20 @@
+---
+title: "Análisis de datos: Diversidad genética y estructura"
+format: html
+author: "Sergio y Sofía"
+---
+
+## Índices básicos de diversidad genética 
+- Populations (stacks)
+- Paquetes de R (vcfR, Adegenet, poppr, hierfstat, pegas)
+
+
+## ADMIXTURE
+- Como correr PGDSpider (manipulación de formatos)
+- Correr ADMIXTURE
+
+## PCA
+- Adegenet
+
+
+## AMOVA?
