@@ -6,6 +6,8 @@ self-contained: true
 keep-md: true
 ---
 
+
+
 ## Índices básicos de diversidad genética 
 - Populations (stacks)
 - Paquetes de R (vcfR, Adegenet, poppr, hierfstat, pegas)
