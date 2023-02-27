@@ -18,3 +18,22 @@ Un nuevo sistema que sacaron los de la compañía que formó RStudio (ahora Posi
 - Es MUY parecido al Rmarkdown, en realidad son compatibles (se pueden visualizar archivos .Rmd en quarto). Tiene algunas diferencias técnicas en la forma en la que se compilan los documentos y algunos cambios en como se pasan las opciones en el YAML y los chuncks de código. 
 - Tiene muchas funciones que ya no necesitan un paquete
 - Tiene algunas cosas que hacen más fácil manipular las opciones del documento y de los chunks de código [(Ver los tres tutoriales para familiarizar)](https://quarto.org/docs/get-started/hello/rstudio.html)
+
+
+**Ambientes de conda**
+
+quality
+    - fastqc
+    - fastqscreen
+    - multiqc
+
+stacks
+    - stacks
+    ## comando para instalar stacks 2.61 en conda = conda install -c bioconda -c conda-forge python=3 
+    ## stacks=2.61 porque habia conflicto con otra paqueteria
+
+ncbi_datasets
+    - ncbi_datasets_cli
+aligner
+    -bowtie2
+    - bwa
