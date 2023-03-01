@@ -9,7 +9,7 @@ self-contained: true
 
 #keep-md: true
 ---
-
+Cambio 2
 ## Instalar miniconda en su usuario 
 
 - Paso 1. Entrar a la siguiente liga `https://docs.conda.io/en/latest/miniconda.html`
