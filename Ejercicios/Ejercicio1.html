@@ -2945,24 +2945,19 @@ DATABASE    PhiX    ../data/genomes/phix/GCA_002798595.1_ASM279859v1_genomic
 <div class="sourceCode" id="cb12"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Activar ambiente de conda</span></span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="ex">conda</span> activate stacks</span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="co">## Script to run stacks ref.pl</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="co">## The 2 steps performed in ref_map.pl are:</span></span>
 <span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="co">## comando para instalar stacks 2.61 en conda = conda install -c bioconda -c conda-forge python=3 </span></span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="co">## stacks=2.61 porque habia conflicto con otra paqueteria</span></span>
-<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a><span class="co">## The 2 steps performed in ref_map.pl are:</span></span>
-<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a><span class="co">### gstacks which will identify SNPs within the meta population for each locus and then genotype each individual at each identified SNP. Once SNPs have been identified and genotyped, gstacks will phase the SNPs at each locus, in each individual, into a set of haplotypes</span></span>
-<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a><span class="co">### populations which will will analyze a population of individual samples computing a number of population genetics statistics as well as exporting a variety of standard output formats. </span></span>
-<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a><span class="va">out_dir</span><span class="op">=</span><span class="st">&quot;../data/vcf/unfiltered/stacks_output/all.90&quot;</span></span>
-<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a><span class="va">popmap</span><span class="op">=</span><span class="st">&quot;../data/sample_metadata/all_morton_popmap&quot;</span></span>
-<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a><span class="va">input_dir</span><span class="op">=</span><span class="st">&quot;../data/alignment/bam/all.90/&quot;</span></span>
-<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> <span class="at">-p</span> <span class="va">$out_dir</span></span>
-<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a><span class="ex">ref_map.pl</span> <span class="at">-o</span> <span class="va">$out_dir</span> <span class="at">-T</span> 18 <span class="at">--popmap</span> <span class="va">$popmap</span> <span class="at">--samples</span> <span class="va">$input_dir</span> <span class="at">-X</span> <span class="st">&quot;populations:--ordered-export --vcf --phylip&quot;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="co">### gstacks which will identify SNPs within the meta population for each locus and then genotype each individual at each identified SNP. Once SNPs have been identified and genotyped, gstacks will phase the SNPs at each locus, in each individual, into a set of haplotypes</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="co">### populations which will will analyze a population of individual samples computing a number of population genetics statistics as well as exporting a variety of standard output formats. </span></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a><span class="va">out_dir</span><span class="op">=</span><span class="st">&quot;../data/vcf/unfiltered/stacks_output/all.90&quot;</span></span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a><span class="va">popmap</span><span class="op">=</span><span class="st">&quot;../data/sample_metadata/all_morton_popmap&quot;</span></span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a><span class="va">input_dir</span><span class="op">=</span><span class="st">&quot;../data/alignment/bam/all.90/&quot;</span></span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> <span class="at">-p</span> <span class="va">$out_dir</span></span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a><span class="ex">ref_map.pl</span> <span class="at">-o</span> <span class="va">$out_dir</span> <span class="at">-T</span> 18 <span class="at">--popmap</span> <span class="va">$popmap</span> <span class="at">--samples</span> <span class="va">$input_dir</span> <span class="at">-X</span> <span class="st">&quot;populations:--ordered-export --vcf --phylip&quot;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 
 </main>

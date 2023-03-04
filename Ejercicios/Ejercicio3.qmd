@@ -6,9 +6,33 @@ self-contained: true
 #keep-md: true
 ---
 
+## Recursos
+
+- [Libro de genetica del paisaje en R](https://bookdown.org/hhwagner1/LandGenCourse_book/)
+- [Applied Population Genetics](http://dyerlab.github.io/applied_population_genetics/index.html)
+- [Tutoriales de genética de poblaciones en R](https://popgen.nescent.org/)
+- [learnPopGen](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6662327/)
+
+
 ## Índices básicos de diversidad genética 
 - Populations (stacks)
 - Paquetes de R (vcfR, Adegenet, poppr, hierfstat, pegas)
+
+### En R
+
+Paquetes útiles para manejo de datos genéticos en R. 
+
+#### vcfR
+
+#### Adegenet
+
+- genind
+- genpop
+- genlight
+
+#### hierfstat
+
+- basic summary
 
 
 ## ADMIXTURE
