@@ -286,6 +286,7 @@ done < ../data/readgroups/sampl_rgp_${file_suffix}
 - [Manual stacks](https://catchenlab.life.illinois.edu/stacks/manual/)
 
 - [Flujo de trabajo detallado con stacks](https://doi.org/10.1111/2041-210X.12775)
+- [de novo](https://cran.r-project.org/web/packages/RADstackshelpR/vignettes/reproducible.vignette.html)
 
 ```{.bash}
 # Activar ambiente de conda

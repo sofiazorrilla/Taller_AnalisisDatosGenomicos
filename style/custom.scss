@@ -5,3 +5,42 @@ max-height: 500px;
 overflow-y: scroll;
 background-color:rgb(233, 233, 233);
 }
+
+.box {
+    background-color: rgba(230, 228, 228, 0.7);
+    width: 100%;
+    padding: 20px;
+    margin: 10px;
+}
+
+.center {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 60%;
+  }
+
+  .zoom {
+    /* (A) OPTIONAL DIMENSIONS */
+    width: 100%;
+    height: auto;
+   
+    /* (B) ANIMATE ZOOM */
+    /* ease | ease-in | ease-out | linear */
+    transition: transform ease-in-out 0.3s;
+  }
+   
+  /* (C) ZOOM ON HOVER */
+  .zoom:hover { transform: scale(1.8); }
+
+.bg-g{
+    background-color: rgba(209, 209, 209, 0.541);
+    padding: -5px;
+    margin-bottom: -10px;
+}
+
+h4 {
+    color: rgb(0, 91, 119);
+    padding: 10px;
+    margin: 10px;
+}

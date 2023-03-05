@@ -1,6 +1,12 @@
 ---
 title: "Análisis de datos: Diversidad genética y estructura"
-format: html
+format: 
+    html:
+        theme: [default, "../style/custom.scss"]
+        page-layout: full
+        toc: true
+        toc-depth: 4
+        toc-location: left
 author: "Sergio y Sofía"
 self-contained: true
 #keep-md: true
@@ -22,15 +28,247 @@ self-contained: true
 
 Paquetes útiles para manejo de datos genéticos en R. 
 
-#### vcfR
+#### `vcfR`
+<hr>
 
-#### Adegenet
+Es un paquete para leer y manipular archivos vcf escrito por Brian J. Knaus. En este tutorial principalmente lo vamos a usar para leer, manipular (obtener subconjuntos, importar a otros formatos) y escribir archivos vcf. 
+
+:::{.box}
+
+ **VCF**
+
+El formato VCF (Variant Call Format) es un formato estandarizado para almacenar información de SNPs, indels y variaciones estructurales. La especificaciones del formato son mantenidas por el [Genomic Data Toolkit](https://www.ga4gh.org/genomic-data-toolkit/) ([formato vcf 2023](http://samtools.github.io/hts-specs/VCFv4.4.pdf)). Es uno de los formatos (input y output) comunes entre los programas de genética.
+
+
+:::{.zoom}
+![](imagenes/vcf.png)
+:::
+:::
+
+- [Introducción al paquete vcfR](https://cran.r-project.org/web/packages/vcfR/vignettes/intro_to_vcfR.html)
+
+- [Manual de funciones vcfR (CRAN)](https://cran.r-project.org/web/packages/vcfR/vcfR.pdf)
+
+
+```{r}
+library(vcfR)
+
+data(vcfR_example)
+vcf
+```
+
+
+**Estructura**
+<hr>
+
+```{r}
+str(vcf)
+```
+
+
+:::{.center}
+![](imagenes/vcfR_str.png)
+:::
+
+:::{.column-margin}
+:::{.box}
+- Tutorial CRAN [VCF data](https://cran.r-project.org/web/packages/vcfR/vignettes/vcf_data.html)
+:::
+:::
+
+**Meta:** Información acerca del archivo, versión, abreviaciones en la sección de fix y gt (INFO y FORMAT)
+```{r}
+strwrap(vcf@meta[1:7])
+```
+
+Resumen de la información en meta
+```{r}
+queryMETA(vcf)
+```
+
+Información de un elemento en particular
+
+```{r}
+queryMETA(vcf, element = 'DP')
+```
+
+**fix:** Datos de cada variante (CHROM, POS, ID, REF, ALT, QUAL, FILTER e INFO)
+
+```{r}
+head(getFIX(vcf)) #getFIX suprime la columna de INFO (separada por comas)
+```
+
+**gt**: Información de cada variante para cada muestra (separada por :). La columna de formato indica el orden de los datos 
+
+```{r}
+vcf@gt[1:6, 1:4]
+```
+
+**Subconjuntos**
+<hr>
+
+```{r}
+vcf[1:3,]
+vcf[,1:3]
+
+```
+
+**Convertir a formatos comunes**
+<hr>
+
+```{r}
+#| warning: false
+
+data = vcfR2genlight(vcf)
+
+```
+
+:::{.column-margin}
+:::{.box}
+Funciones útiles cambio de formato:
+
+*adegenet*
+
+- `vcfR2genind`
+- `vcfR2genlight`
+
+*tidy*
+
+- `vcfR2tidy`
+:::
+:::
+
+<br>
+
+**Ejercicio**
+<hr>
+
+::: {.panel-tabset}
+## Ejercicio
+
+1. Utiliza la función `read.vcfR` para leer el archivo vcf de prueba.
+2. Examina los slots del objeto  
+3. Convierte el objeto a formato `genind`
+
+
+## Respuesta
+
+```{.r}
+# Leer archivo vcf
+data = read.vcfR("../inputs/vcf/archivo.vcf")
+
+# Convertir a formato genind
+genind = vcfR2genind(data)
+```
+:::
+
+
+#### `adegenet`
+<hr>
+
+- [Tutorial adegenet 1.2-7](https://adegenet.r-forge.r-project.org/files/tutorial.pdf)
+
+Hay 3 clases de objetos principales: 
 
 - genind
 - genpop
 - genlight
 
-#### hierfstat
+**genind**
+<hr>
+
+Objeto S4 con diferentes slots que se ingresan usando @:
+
+- `@tab`: matriz de genotipos
+- `@loc.n.all`: número de alelos por locus
+- `@loc.fac`: factor de loci (nombres de loci)
+- `@all.names`: alelos por locus (ej. loci bialélicos tienen alelo 0 y 1)
+- `@ploidy`: ploidia
+- `@type`: tipo de marcador
+- `@call`: comando
+
+Opcionalmente 
+
+- `@pop`: factor que indica la población a la que pertenece cada individuo
+- `@strata`: factor con niveles jerárquicos a los que pertenecen los individuos (ej. población, región)
+- `@other`: una lista con: xy
+
+```{r}
+#| warning: false
+
+library(adegenet)
+
+data(nancycats)
+```
+
+**genpop**
+<hr>
+
+A diferencia de `genind`genpop almacena los conteos por locus de cada población.
+
+- `@tab`: matriz de alelos
+- `@loc.n.all`: número de alelos por locus (range: 8-18)
+- `@loc.fac`: factor de loci (nombres de loci)
+- `@all.names`: lista de alelos por locus
+- `@ploidy`: ploidia
+- `@type`:  tipo de marcador
+- `@call`: comando 
+- `@other`: una lista con: xy
+
+
+```{r}
+genind2genpop(nancycats)
+```
+
+**genlight**
+<hr>
+
+Objeto que puede guardar la información genotípica de una manera más eficiente que los dos anteriores.
+
+- `@ind.names`:  número de individuos
+- `@loc.names`:  número de loci
+- `@chromosome`: vector de cromosomas
+- `@position`: vector de posiciones
+- `@other`: metadatos
+
+```{r}
+data 
+```
+
+**Filtros**
+
+- El elemento principal de los tres objetos anteriores es la matriz de genotipos, por lo tanto, se pueden filtrar como data frame objeto[individuos, loci].
+
+```{r}
+data[1:3,1:10]
+```
+
+- También se pueden filtrar utilizando la información de los otros slots 
+
+```{r}
+#| warning: false
+
+library(tidyverse)
+
+set.seed(10)
+sample(indNames(nancycats),10)
+
+set.seed(10)
+t = nancycats[which(rownames(nancycats@tab) %in% sample(indNames(nancycats),10)),]
+t@tab[,1:5]
+
+```
+
+**Resumenes**
+<hr>
+
+```{r}
+summary(nancycats)
+```
+
+
+#### `hierfstat`
+<hr>
 
 - basic summary
 
@@ -44,3 +282,4 @@ Paquetes útiles para manejo de datos genéticos en R.
 
 
 ## AMOVA?
+
