@@ -17,8 +17,117 @@ self-contained: true
 
 **Comandos útiles**
 
+[50 comandos útiles](https://www.freecodecamp.org/espanol/news/hoja-de-referencia-de-git-50-comandos-de-git-que-debe-conocer-2/)
+
+
 ### Diagramas 
 
 ![](imagenes/diagrama_git.svg)
 
 ![](imagenes/diagrama2.svg)
+
+
+### Ejercicio en la terminal
+
+::: {.panel-tabset}
+
+## Ejercicio
+
+1. ¿Cómo podrías quedarte con el repositorio del taller en tu github? ¿En dónde se aplica el comando?
+
+2. Copia el repositorio en tu computadora
+
+3. Crea una nueva rama (nombrada con tu nombre) y cambiate a esa rama.
+
+4. En la carpeta de ejercicios de git crea un archivo de texto nuevo y en la primera línea ponle tu nombre (el nombre del archivo también debe ser tu nombre). Después de guardar el archivo utiliza comandos de git para añadir el archivo al área de "stage" y guardar los cambios en tu repositorio local. Finalmente utiliza un comando de git para revisar el historial de tu archivo.
+
+5. Actualiza los cambios en tu versión del repositorio en github (el que hiciste utilizando la herramienta de fork). Recuerda que los cambios se van a subir en la rama que creaste por lo que si quieres revisar que se hayan actualizado debes seleccionar la rama adecuada en github.
+
+6. Una vez que hayas revisado que todo está bien y no haya conflictos genera un pull request para unir tus cambios con la rama principal. 
+
+
+## Respuesta
+
+**Ejercicio 1:** `git fork`, en github pestaña de fork. 
+
+![](imagenes/fork.png)
+
+
+
+**Ejercicio 2:** 
+
+`git clone https://...` (sustituye por el link del repositorio)
+
+
+
+**Ejercicio 3:**
+
+```{.bash}
+# Crear nueva rama 
+git branch sofia
+
+# Cambiarme a la rama recien creada
+git checkout sofia 
+
+# Enlistar ramas para revisar en donde estoy. El asterisco indica la rama actual.
+git branch
+```
+
+**Ejercicio 4:**
+
+```{.bash}
+# Crear un archivo y añadir tu nombre utilizando el editor de texto NANO. Utiliza ctrl+x para guardar los cambios una vez que escribas tu nombre dentro del archivo.
+
+nano sofia.txt
+
+# Añadir cambios al stage
+
+git add sofia.txt
+
+# Guardar los cambios en el repositorio local. Tendrás que escribir un mensaje corto describiendo el cambio. (La opción -m es un atajo para describir el cambio realizado en el mismo comando, puedes utilizar simplemente git commit y automáticamente abrirá un editor de texto para que escribas el mensaje)
+
+git commit -m "Escribi mi nombre"
+
+# Revisar historial 
+
+git log
+
+```
+
+**Ejercicio 5:**
+
+```{.bash}
+# Mandar los cambios al repositorio de github a la rama que cree
+git push origin/sofia
+```
+![](imagenes/branches_git.png)
+
+**Ejercicio 6:**
+
+Cuando hayas hecho el comit te aparecerá un mensaje similar, haz click en compare and pull request para generar el pull request. 
+
+![](imagenes/PR-1.png)
+
+Si estuvieras colaborando con alguien más aquí se explicarían los cambios que realizaste para que los administradores puedan aceptar el pull request. Ha click en el botón verde. 
+
+![](imagenes/PR-2.png)
+
+Ahora sería el turno del colaborador de revisar los cambios y decidir si lo quieren incorporar a la rama principal del repositorio. Si decides aceptar haz click en merge pull request 
+
+
+![](imagenes/PR-3.png)
+
+Deja un comentario para el historial del repositorio.
+
+![](imagenes/PR-4.png)
+
+Comprueba que los cambios han sido añadidos a la rama principal. 
+
+![](imagenes/PR-5.png)
+
+:::
+
+
+### Git y github con RStudio
+
+[Tutorial](http://destio.us.es/calvo/asignaturas/ge_esco/tutorialusargitgithubrstudio/UsarGitGithubconRStudio.html)
