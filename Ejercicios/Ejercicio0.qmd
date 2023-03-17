@@ -1,0 +1,24 @@
+---
+title: "Herramientas útiles para proyecto bioinformático"
+format: 
+    html:
+        theme: [default, "../style/custom.scss"]
+        page-layout: full
+author: "Sergio y Sofía"
+self-contained: true
+
+#keep-md: true
+---
+
+## Control de versiones básico (Git)
+
+**¿Qué es git?**
+[Video de introducción a Git](https://www.youtube.com/watch?v=kEPF-MWGq1w&t=636s&ab_channel=PeladoNerd)
+
+**Comandos útiles**
+
+### Diagramas 
+
+![](imagenes/diagrama_git.svg)
+
+![](imagenes/diagrama2.svg)

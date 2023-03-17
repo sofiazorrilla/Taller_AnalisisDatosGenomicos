@@ -9,7 +9,7 @@ self-contained: true
 
 #keep-md: true
 ---
-Cambio 2
+
 ## Instalar miniconda en su usuario 
 
 - Paso 1. Entrar a la siguiente liga `https://docs.conda.io/en/latest/miniconda.html`
@@ -52,6 +52,7 @@ STACKS tool process_radtags which:
 - script: `process_radtags.sh`
 
 Parameters:
+
 - `-p` we indicate the directory with the sequence data
 - `-i` the type of sequence file
 - `-o` the output directory
