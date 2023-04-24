@@ -7,6 +7,7 @@ format:
         toc: true
         toc-depth: 4
         toc-location: left
+        fontsize: 1rem
 author: "Sergio y Sofía"
 self-contained: true
 #keep-md: true
@@ -174,6 +175,15 @@ Hay 3 clases de objetos principales:
 - genpop
 - genlight
 
+:::{.column-margin}
+:::{.box}
+Otras funciones para importar datos *adegenet*
+
+- `df2genind`
+- `genind2hierfstat`
+:::
+:::
+
 **genind**
 <hr>
 
@@ -270,7 +280,39 @@ summary(nancycats)
 #### `hierfstat`
 <hr>
 
-- basic summary
+
+```{r}
+#| warning: false
+
+library(hierfstat)
+
+data = genind2hierfstat(nancycats)
+
+basic_stats = basic.stats(data) 
+```
+
+Resultados por locus
+```{r}
+#| warning: false
+#| echo: false
+#| code-fold: true
+library(flextable)
+
+flextable(basic_stats$perloc)
+```
+<br>
+
+Resultados generales 
+```{r}
+#| warning: false
+#| echo: false
+#| code-fold: true
+
+flextable(data.frame(Índice = names(basic_stats$overall),Valor = basic_stats$overall))
+
+```
+
+
 
 
 ## ADMIXTURE
