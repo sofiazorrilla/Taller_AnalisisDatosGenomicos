@@ -17,6 +17,21 @@ format:
 ![](imagenes/etapas.png)
 :::
 
+## Instalar miniconda
+
+```{.bash}
+# Ir a su home
+cd ~
+# Descargar el script para instalar la versión más reciente
+wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh 
+# Hacer ejecutable el script
+chmod +x Miniconda3-latest-Linux-x86_64.sh 
+# Ejecutar el script
+bash Miniconda3-latest-Linux-x86_64.sh 
+# Opcional: evitar que conda inicie automaticamente al abrir una terminal 
+conda config --set auto_activate_base false
+```
+
 
 ## RADseq
 
@@ -186,7 +201,8 @@ Closing files, flushing buffers...done.
 ![](imagenes/calidad.png)
 
 ## FastQC 
-<br>
+::: {.panel-tabset}
+#### Ejemplo
 
 :::{.small}
 1. Activamos el ambiente de conda que tiene instalado el software fastq 
@@ -209,7 +225,22 @@ for file in $files
     fastqc $file -o ../outputs/fastqc/morton_data/
 done	
 ```
+#### Ejercicio 
+
+```{.bash}
+conda activate quality
+
+files=$(ls -d data/demultiplex_raw/*.gz)
+
+for file in $files
+  do
+    fastqc $file -o outputs/fastqc/
+done	
+
+```
+:::
 ::: {.aside}
+<br>
 [Video Tutorial](https://www.youtube.com/watch?v=bz93ReOv87Y&ab_channel=BabrahamBioinf)
 :::
 
@@ -230,7 +261,7 @@ Utilizando las herramientas de la linea de comandos de ncbi, descarga los genoma
 ```{.bash}
 # Metadatos de los genomas de referencia disponibles
 datasets summary genome taxon 'E. coli' \ # entre las comillas se pueden poner nombres comunes o científicos
-    --assembly-source refseq \ # (--reference) para ver genomas de referencia 
+    --assembly-source refseq \ #(--reference) para ver genomas de referencia 
     --as-json-lines | dataformat tsv genome \
     --fields accession,assminfo-name,annotinfo-name,annotinfo-release-date,organism-name
 ```
@@ -257,7 +288,7 @@ datasets download genome accession GCF_000008865.2 \
 
 :::{.small}
 Paso 2. Indexar los genomas que vamos a poner a prueba con el paquete bowtie2
-
+raw_data/morton_data
 Activar ambiente de conda
 ```{.bash}
 conda activate mapping
@@ -265,7 +296,7 @@ conda activate mapping
 Index reference genomes to use fastq_screen
 
 ```{.bash}
-cd ../data/genomes/ # ir a directorio donde están las carpetas de cada genoma
+cd data/genomes/ # ir a directorio donde están las carpetas de cada genoma
 paths=$(ls -d $PWD/*) # enlistar todas las carpetas
 ```
 
@@ -300,6 +331,9 @@ cat(readLines('../inputs/fastq_screen/fastq_screen.conf'), sep = '\n')
 
 ##
 
+::: {.panel-tabset}
+#### Ejemplo
+
 :::{.small}
 Paso 4. Correr el programa para cada muestra y escribir los resultados en una carpeta del directorio "outputs"
 
@@ -311,10 +345,25 @@ files=$(ls -d ../data/raw_data/morton_data/*.gz)
 fastq_screen --threads 10 --aligner bowtie2 --conf fastq_screen.conf $files --outdir ../outputs/fastq_screen/morton_data/
 ```
 :::
+#### Ejercicio
+
+```{.bash}
+# Activamos el ambiente de conda que tiene instalado el software fastq
+
+conda activate ./envs/quality
+
+# Listar todos los archivos con terminación .gz. La opción -d permite enlistar rutas completas.
+files=$(ls -d data/demultiplex_raw/*.gz)
+
+fastq_screen --threads 10 --aligner bowtie2 --conf data/fastq_screen.conf $files --outdir outputs/fastq_screen/
+```
+:::
 
 ## MultiQC
 
-<br>
+::: {.panel-tabset}
+#### Ejemplo
+
 
 ```{.bash}
 ## Directories
@@ -329,6 +378,18 @@ fastq_screen="../outputs/fastq_screen/morton_data/"
 ## Command
 multiqc --force --interactive $fastqc $fastq_screen --outdir ../outputs/multiqc/morton_data/ 
 ```
+#### Ejercicio
+
+```{.bash}
+conda activate quality 
+
+fastqc="outputs/fastqc/"
+fastq_screen="outputs/fastq_screen/"
+
+multiqc --force --interactive $fastqc $fastq_screen --outdir outputs/multiqc/
+```
+
+:::
 
 ::: aside
 [Manual Multiqc](https://multiqc.info/docs/)
@@ -341,60 +402,56 @@ multiqc --force --interactive $fastqc $fastq_screen --outdir ../outputs/multiqc/
 
 ```{.bash}
 # Activar el ambiente de conda donde tenemos bwa instalado 
-conda activate aligner
+conda activate mapping
 # indexar genoma 
-bwa index ../data/Qlobata/GCF_001633185.2_ValleyOak3.2/index/GCF_001633185.2_ValleyOak3.2_genomic.fna
+bwa index data/genomes/qlobata/GCA_001633185.5_ValleyOak3.2_genomic.fna
 ```
 
 ##
 
 3. Alinear cada muestra al genoma de referencia. 
 
-```{.bash}
+```{.bash code-line-numbers="|8|10|11|13|18|24|"}
 ## Align to reference genome (Q.lobata) using BWA-MEM
 
-######### read group file suffix
-file_suffix="morton_data2"
-
 ######### input data directory
-folder_data="../data/raw_data/morton_data/set2/"
+folder_data="data/demultiplex_raw/"
 
-######### output directories
-out_folder="morton_data2"
-mkdir -p ../data/alignment/sam/$out_folder
-mkdir -p ../data/alignment/bam/$out_folder
+######### Loop
 
-while read sample readgroup
+while read file sample
 do
-  echo "bwa mem -M -t 18 -R ${readgroup} ../data/genomes/qlobata/GCA_001633185.5_ValleyOak3.2_genomic.fna ${folder_data}/${sample}.fastq.gz > ../data/alignment/sam/${out_folder}/${sample}.sam" | bash
+  echo "bwa mem -M -t 18 data/genomes/qlobata/GCA_001633185.5_ValleyOak3.2_genomic.fna ${file} > outputs/sam/${sample}.sam" | bash
+done < data/demultiplex_raw/sample.list
 
-  picard SortSam I=../data/alignment/sam/${out_folder}/${sample}.sam O=../data/alignment/bam/${out_folder}/${sample}.bam SORT_ORDER=coordinate
+conda deactivate 
 
-  samtools index ../data/alignment/bam/${out_folder}/${sample}.bam
+while read file sample
+do
 
-done < ../data/readgroups/sampl_rgp_${file_suffix}
+  PicardCommandLine SortSam I=outputs/sam/${sample}.sam O=outputs/bam/${sample}.bam SORT_ORDER=coordinate
+
+done < data/demultiplex_raw/sample.list
+
+while read file sample
+do
+  samtools index outputs/bam/${sample}.bam
+done < data/demultiplex_raw/sample.list
+
 ```
 
 ## Llamado de SNPs
+::: small
+Dos pasos realizados por ref_map.pl:
 
-- [Manual stacks](https://catchenlab.life.illinois.edu/stacks/manual/)
+- **gstacks**: Se identificarán SNP dentro de la metapoblación para cada locus y luego se genotipará a cada individuo en cada SNP identificado
 
-- [Flujo de trabajo detallado con stacks](https://doi.org/10.1111/2041-210X.12775)
-
-- [de novo](https://cran.r-project.org/web/packages/RADstackshelpR/vignettes/reproducible.vignette.html)
+- **populations**: Calcula una serie de estadísticas de genética poblacional y exporta a una variedad de formatos de salida estándar. 
 
 ```{.bash}
 # Activar ambiente de conda
 conda activate stacks
-```
 
-The 2 steps performed in ref_map.pl are:
-
-- gstacks which will identify SNPs within the meta population for each locus and then genotype each individual at each identified SNP. Once SNPs have been identified and genotyped, gstacks will phase the SNPs at each locus, in each individual, into a set of haplotypes
-
-- populations which will will analyze a population of individual samples computing a number of population genetics statistics as well as exporting a variety of standard output formats. 
-
-```{.bash}
 out_dir="../data/vcf/unfiltered/stacks_output/all.90"
 popmap="../data/sample_metadata/all_morton_popmap"
 input_dir="../data/alignment/bam/all.90/"
@@ -403,3 +460,7 @@ mkdir -p $out_dir
 
 ref_map.pl -o $out_dir -T 18 --popmap $popmap --samples $input_dir -X "populations:--ordered-export --vcf --phylip"
 ```
+::: aside
+[Manual stacks](https://catchenlab.life.illinois.edu/stacks/manual/), [Flujo de trabajo detallado con stacks](https://doi.org/10.1111/2041-210X.12775), [de novo](https://cran.r-project.org/web/packages/RADstackshelpR/vignettes/reproducible.vignette.html)
+:::
+:::
