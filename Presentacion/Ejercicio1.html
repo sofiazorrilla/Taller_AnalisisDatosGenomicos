@@ -5,9 +5,10 @@
 <script src="Ejercicio1_files/libs/quarto-html/popper.min.js"></script>
 <script src="Ejercicio1_files/libs/quarto-html/tippy.umd.min.js"></script>
 <link href="Ejercicio1_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="Ejercicio1_files/libs/quarto-html/light-border.css" rel="stylesheet">
 <link href="Ejercicio1_files/libs/quarto-html/quarto-html.min.css" rel="stylesheet" data-mode="light">
 <link href="Ejercicio1_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
-  <meta name="generator" content="quarto-1.2.335">
+  <meta name="generator" content="quarto-1.3.217">
 
   <meta name="author" content="Taller de análisis de datos genómicos">
   <title>Datos crudos a SNPs</title>
@@ -401,13 +402,9 @@ Taller de análisis de datos genómicos
 </section>
 <section id="flujo-de-trabajo" class="slide level2">
 <h2>Flujo de trabajo</h2>
-<ol type="1">
-<li>Archivos crudos</li>
-<li>Descomprimir</li>
-<li>Revisión de calidad</li>
-<li>Alineación a genoma de referencia</li>
-<li>Llamado de SNPs</li>
-</ol>
+<div style="width: 1100px; position: absolute; top: 30%; right: -10%">
+<p><img data-src="imagenes/etapas.png"></p>
+</div>
 </section>
 <section id="radseq" class="slide level2">
 <h2>RADseq</h2>
@@ -418,95 +415,152 @@ Taller de análisis de datos genómicos
 <p>Archivos crudos</p>
 </div>
 </section>
-<section id="section" class="slide level2">
-<h2></h2>
+<section id="fastq" class="slide level2">
+<h2>fastq</h2>
+<div class="sourceCode" id="cb1"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1"></a><span class="fu">zcat</span> archivo.fastq.gz</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Ejemplo:</p>
+<div class="sourceCode" id="cb2" data-code-line-numbers="|1-4|1|2|3|4|"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1"></a><span class="ex">@A01335:226:HJH2MDRX2:1:2101:1081:1016</span> 1:N:0:1</span>
+<span id="cb2-2"><a href="#cb2-2"></a><span class="ex">GNATTGTCGCTGCAGCTAGTATTGCTATCTGCTTAGCTATAGCTTTGGATTGGGCTTTTGTGGTATCACAAGCTTCCAAAAAAAAGTTTCCATCTCTATCAATGGAACACCCTTTCCAAATAACAATAAATA</span></span>
+<span id="cb2-3"><a href="#cb2-3"></a><span class="ex">+</span></span>
+<span id="cb2-4"><a href="#cb2-4"></a><span class="ex">F#FF,,:F,FFFFFF,,FF,:::F:FF::,F,,F,,F,F,F::,,::,:,FFFFF:FFF:F::FF,,F,FF:,,F:,F:,FFFF::,FFFF,::F:FF,:FF:,,FFFF,,FF,F,:FFFFFFFFFFFFFFF</span></span>
+<span id="cb2-5"><a href="#cb2-5"></a><span class="ex">@A01335:226:HJH2MDRX2:1:2101:1099:1016</span> 1:N:0:1</span>
+<span id="cb2-6"><a href="#cb2-6"></a><span class="ex">TNCTTGCGCTTGCAGGTCCCTTTTGCTGTGACGAGACAGCCATCGCACCTGTTCCGATGTTTGTTATAGGGCTGTGTGCCGAAGTGTCCAAATGGCCCGTTGACATTCGCTGCACCACATACGCGTAGCTCA</span></span>
+<span id="cb2-7"><a href="#cb2-7"></a><span class="ex">+</span></span>
+<span id="cb2-8"><a href="#cb2-8"></a><span class="ex">F#FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF:FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF,</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><br></p>
+<div class="small">
+<p>Encabezado:</p>
+</div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1"></a><span class="ex">@</span><span class="op">&lt;</span>instrument<span class="op">&gt;</span>:<span class="op">&lt;</span>run number<span class="op">&gt;</span>:<span class="op">&lt;</span>flowcell ID<span class="op">&gt;</span>:<span class="op">&lt;</span>lane<span class="op">&gt;</span>:<span class="op">&lt;</span>tile<span class="op">&gt;</span>:<span class="op">&lt;</span>x-pos<span class="op">&gt;</span>:<span class="op">&lt;</span>y-pos<span class="op">&gt;</span> <span class="op">&lt;</span>read<span class="op">&gt;</span>:<span class="op">&lt;</span>is filtered<span class="op">&gt;</span>:<span class="op">&lt;</span>control number<span class="op">&gt;</span>:<span class="op">&lt;</span>sample number<span class="op">&gt;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="phred-score" class="slide level2">
+<h2>Phred score</h2>
+<div class="small">
+<p>Métrica utilizada para evaluar qué tanta confianza tenemos en la base designada en una secuencia.</p>
+<p><span class="math display">\[
+Q = -10log10(e)
+\]</span></p>
+</div>
+<div class="columns">
+<div class="column small" style="width:40%;">
+<p><br></p>
+<table>
+<thead>
+<tr class="header">
+<th>Q</th>
+<th>Probabilidad de error</th>
+<th>% de precisión</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>10</td>
+<td>1 en 10</td>
+<td>90 %</td>
+</tr>
+<tr class="even">
+<td>20</td>
+<td>1 en 100</td>
+<td>99 %</td>
+</tr>
+<tr class="odd">
+<td>30</td>
+<td>1 en 1000</td>
+<td>99.9%</td>
+</tr>
+<tr class="even">
+<td>40</td>
+<td>1 en 10000</td>
+<td>99.99%</td>
+</tr>
+</tbody>
+</table>
+</div><div class="column" style="width:60%;">
+<div class="cell" data-fig.dpi="300">
+<div class="cell-output-display">
+<p><img data-src="Ejercicio1_files/figure-revealjs/unnamed-chunk-1-1.png" width="960"></p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="demultiplex" class="slide level2">
+<h2>Demultiplex</h2>
 <div style="width: 1300px; position: absolute; top: 30%; right: -18%">
 <p><img data-src="imagenes/demultiplex.png"></p>
 </div>
 <div class="footer">
-<p>Archivos crudos</p>
-</div>
-</section>
-<section id="fastq" class="slide level2">
-<h2>fastq</h2>
-<div class="sourceCode" id="cb1"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1"></a><span class="fu">zcat</span> archivo.fastq.gz</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>Ejemplo de archivo fastq (explicar las partes)</p>
-</section>
-<section id="phred-score" class="slide level2">
-<h2>Phred score</h2>
-<p>Métrica utilizada para evaluar qué tanta confianza tenemos en la base designada en una secuencia.</p>
-<p><span class="math display">\[
-Q = -10log E
-\]</span></p>
-<p>Tabla</p>
-<p>Gráfica</p>
-</section>
-<section id="demultiplex" class="slide level2">
-<h2>Demultiplex</h2>
-<p><br></p>
-<div class="sourceCode" id="cb2" data-code-line-numbers="|13|"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1"></a><span class="va">input_dir</span><span class="op">=</span>../data/raw_data/batch_01846</span>
-<span id="cb2-2"><a href="#cb2-2"></a><span class="va">barcodes_file</span><span class="op">=</span>../data/barcodes/barcodes_01846.txt</span>
-<span id="cb2-3"><a href="#cb2-3"></a></span>
-<span id="cb2-4"><a href="#cb2-4"></a><span class="co">#mkdir ../data/demultiplexed_raw2/batch_01846</span></span>
-<span id="cb2-5"><a href="#cb2-5"></a></span>
-<span id="cb2-6"><a href="#cb2-6"></a><span class="ex">process_radtags</span> <span class="at">-t</span> 18 <span class="dt">\ </span># número de núcleos</span>
-<span id="cb2-7"><a href="#cb2-7"></a>                <span class="ex">-p</span> <span class="va">$input_dir</span> <span class="dt">\</span></span>
-<span id="cb2-8"><a href="#cb2-8"></a>                <span class="at">-i</span> gzfastq <span class="dt">\</span></span>
-<span id="cb2-9"><a href="#cb2-9"></a>                <span class="at">-o</span> ../data/demultiplexed_raw2/batch_01846 <span class="dt">\</span></span>
-<span id="cb2-10"><a href="#cb2-10"></a>                <span class="at">-b</span> <span class="va">$barcodes_file</span> <span class="dt">\</span></span>
-<span id="cb2-11"><a href="#cb2-11"></a>                <span class="at">--renz_1</span> pstI <span class="dt">\ </span># enzima de restricción</span>
-<span id="cb2-12"><a href="#cb2-12"></a>                <span class="ex">-r</span> <span class="at">-c</span> <span class="dt">\</span></span>
-<span id="cb2-13"><a href="#cb2-13"></a>                <span class="at">--barcode-dist-1</span> 2 <span class="dt">\ </span># numero de discrepancias en el barcode</span>
-<span id="cb2-14"><a href="#cb2-14"></a>                <span class="ex">-D</span> <span class="dt">\</span></span>
-<span id="cb2-15"><a href="#cb2-15"></a>                <span class="op">&amp;&gt;</span>out_demultiplex_01846.log <span class="co"># una forma de guardar lo que se imprime en pantalla </span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</section>
-<section id="barcode-file" class="slide level2">
-<h2>barcode file</h2>
-<div style="position: absolute; top: 30%; right: 30%">
-<div class="sourceCode" id="cb3"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1"></a><span class="ex">TCCGGAGCGC</span>  ATZ01</span>
-<span id="cb3-2"><a href="#cb3-2"></a><span class="ex">CTAACACGGC</span>  CUZ48</span>
-<span id="cb3-3"><a href="#cb3-3"></a><span class="ex">AGCTTCGATT</span>  HUT68</span>
-<span id="cb3-4"><a href="#cb3-4"></a><span class="ex">TCGCCGCAAT</span>  OAX73</span>
-<span id="cb3-5"><a href="#cb3-5"></a><span class="ex">TCAGTTCCGG</span>  VC64</span>
-<span id="cb3-6"><a href="#cb3-6"></a><span class="ex">CGGAAGTGAG</span>  LIPA01</span>
-<span id="cb3-7"><a href="#cb3-7"></a><span class="ex">GTTGCTAGAC</span>  OLV04</span>
-<span id="cb3-8"><a href="#cb3-8"></a><span class="ex">AATAGATTCA</span>  TRI08</span>
-<span id="cb3-9"><a href="#cb3-9"></a><span class="ex">AGCTGATACA</span>  ATZ07</span>
-<span id="cb3-10"><a href="#cb3-10"></a><span class="ex">...</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Demultiplex</p>
 </div>
 </section>
 <section id="demultiplex-1" class="slide level2">
 <h2>Demultiplex</h2>
-<pre><code>Processing single-end data.
-Using Phred+33 encoding for quality scores.
-Found 1 input file(s).
-Searching for single-end, inlined barcodes.
-Loaded 96 barcodes (10bp).
-Will attempt to recover barcodes with at most 2 mismatches.
-Setting number of threads to 18; 1 reader thread; 4 writer threads; 13 worker threads.
-Processing file 1 of 1 [Qins_2019004-01846.fastq.gz]
-  Processing RAD-Tags...1M...2M...3M...4M...5M...6M...7M...8M...9M...10M...11M...
-12M...13M...14M...15M...16M...17M...18M...19M...20M...21M...22M...23M...24M...25M...
-26M...27M...28M...29M...30M...31M...32M...33M...34M...35M...36M...37M...38M...39M...
-40M...41M...42M...43M...44M...45M...46M...47M...48M...49M...50M...51M...52M...53M...
-54M...55M...56M...57M...58M...59M...60M...61M...62M...63M...64M...65M...66M...67M...
-68M...69M...70M...71M...72M...73M...74M...75M...76M...77M...78M...79M...80M...81M...
-...
-...
-561320480 total reads; -113381046 ambiguous barcodes; -7148939 ambiguous RAD-Tags; +12292198 recovered; -60222 low quality reads; 440730273 retained reads.
-Closing files, flushing buffers...done.
-
-561320480 total sequences
-113381046 barcode not found drops (20.2%)
-    60222 low quality read drops (0.0%)
-  7148939 RAD cutsite not found drops (1.3%)
-440730273 retained reads (78.5%)
-</code></pre>
+<p><br></p>
+<div class="sourceCode" id="cb4" data-code-line-numbers="|13|"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1"></a><span class="va">input_dir</span><span class="op">=</span>../data/raw_data/batch_01846</span>
+<span id="cb4-2"><a href="#cb4-2"></a><span class="va">barcodes_file</span><span class="op">=</span>../data/barcodes/barcodes_01846.txt</span>
+<span id="cb4-3"><a href="#cb4-3"></a></span>
+<span id="cb4-4"><a href="#cb4-4"></a><span class="co">#mkdir ../data/demultiplexed_raw2/batch_01846</span></span>
+<span id="cb4-5"><a href="#cb4-5"></a></span>
+<span id="cb4-6"><a href="#cb4-6"></a><span class="ex">process_radtags</span> <span class="at">-t</span> 18 <span class="dt">\ </span># número de núcleos</span>
+<span id="cb4-7"><a href="#cb4-7"></a>                <span class="ex">-p</span> <span class="va">$input_dir</span> <span class="dt">\</span></span>
+<span id="cb4-8"><a href="#cb4-8"></a>                <span class="at">-i</span> gzfastq <span class="dt">\</span></span>
+<span id="cb4-9"><a href="#cb4-9"></a>                <span class="at">-o</span> ../data/demultiplexed_raw2/batch_01846 <span class="dt">\</span></span>
+<span id="cb4-10"><a href="#cb4-10"></a>                <span class="at">-b</span> <span class="va">$barcodes_file</span> <span class="dt">\</span></span>
+<span id="cb4-11"><a href="#cb4-11"></a>                <span class="at">--renz_1</span> pstI <span class="dt">\ </span># enzima de restricción</span>
+<span id="cb4-12"><a href="#cb4-12"></a>                <span class="ex">-r</span> <span class="at">-c</span> <span class="dt">\</span></span>
+<span id="cb4-13"><a href="#cb4-13"></a>                <span class="at">--barcode-dist-1</span> 2 <span class="dt">\ </span># numero de discrepancias en el barcode</span>
+<span id="cb4-14"><a href="#cb4-14"></a>                <span class="ex">-D</span> <span class="dt">\</span></span>
+<span id="cb4-15"><a href="#cb4-15"></a>                <span class="op">&amp;&gt;</span>out_demultiplex_01846.log <span class="co"># una forma de guardar lo que se imprime en pantalla </span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="barcode-file" class="slide level2">
+<h2>barcode file</h2>
+<div style="position: absolute; top: 30%; right: 30%">
+<div class="sourceCode" id="cb5"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1"></a><span class="ex">TCCGGAGCGC</span>  ATZ01</span>
+<span id="cb5-2"><a href="#cb5-2"></a><span class="ex">CTAACACGGC</span>  CUZ48</span>
+<span id="cb5-3"><a href="#cb5-3"></a><span class="ex">AGCTTCGATT</span>  HUT68</span>
+<span id="cb5-4"><a href="#cb5-4"></a><span class="ex">TCGCCGCAAT</span>  OAX73</span>
+<span id="cb5-5"><a href="#cb5-5"></a><span class="ex">TCAGTTCCGG</span>  VC64</span>
+<span id="cb5-6"><a href="#cb5-6"></a><span class="ex">CGGAAGTGAG</span>  LIPA01</span>
+<span id="cb5-7"><a href="#cb5-7"></a><span class="ex">GTTGCTAGAC</span>  OLV04</span>
+<span id="cb5-8"><a href="#cb5-8"></a><span class="ex">AATAGATTCA</span>  TRI08</span>
+<span id="cb5-9"><a href="#cb5-9"></a><span class="ex">AGCTGATACA</span>  ATZ07</span>
+<span id="cb5-10"><a href="#cb5-10"></a><span class="ex">...</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="demultiplex-2" class="slide level2">
+<h2>Demultiplex</h2>
+<div class="sourceCode" id="cb6" data-code-line-numbers="false"><pre class="sourceCode md code-with-copy"><code class="sourceCode markdown"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>Processing single-end data.</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>Using Phred+33 encoding for quality scores.</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>Found 1 input file(s).</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>Searching for single-end, inlined barcodes.</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>Loaded 96 barcodes (10bp).</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>Will attempt to recover barcodes with at most 2 mismatches.</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>Setting number of threads to 18; 1 reader thread; 4 writer threads; 13 worker threads.</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>Processing file 1 of 1 <span class="co">[</span><span class="ot">Qins_2019004-01846.fastq.gz</span><span class="co">]</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>  Processing RAD-Tags...1M...2M...3M...4M...5M...6M...7M...8M...9M...10M...11M...</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>12M...13M...14M...15M...16M...17M...18M...19M...20M...21M...22M...23M...24M...25M...</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>26M...27M...28M...29M...30M...31M...32M...33M...34M...35M...36M...37M...38M...39M...</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>40M...41M...42M...43M...44M...45M...46M...47M...48M...49M...50M...51M...52M...53M...</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>54M...55M...56M...57M...58M...59M...60M...61M...62M...63M...64M...65M...66M...67M...</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>68M...69M...70M...71M...72M...73M...74M...75M...76M...77M...78M...79M...80M...81M...</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>...</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>...</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>561320480 total reads; -113381046 ambiguous barcodes; -7148939 ambiguous RAD-Tags; +12292198 recovered; -60222 low quality reads; 440730273 retained reads.</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>Closing files, flushing buffers...done.</span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>561320480 total sequences</span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>113381046 barcode not found drops (20.2%)</span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>    60222 low quality read drops (0.0%)</span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>  7148939 RAD cutsite not found drops (1.3%)</span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>440730273 retained reads (78.5%)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section id="revisión-de-calidad" class="slide level2">
 <h2>Revisión de calidad</h2>
 
-<img data-src="imagenes/calidad.png" class="r-stretch"><div class="footer footer-default">
+<img data-src="imagenes/calidad.png" class="r-stretch"></section>
+<section id="fastqc" class="slide level2">
+<h2>FastQC</h2>
+<div class="footer footer-default">
 <p>Reveal js Quarto</p>
 </div>
 </section>
@@ -721,6 +775,44 @@ Closing files, flushing buffers...done.
         ]
       });
     </script>
+    
+    <script>
+      // htmlwidgets need to know to resize themselves when slides are shown/hidden.
+      // Fire the "slideenter" event (handled by htmlwidgets.js) when the current
+      // slide changes (different for each slide format).
+      (function () {
+        // dispatch for htmlwidgets
+        function fireSlideEnter() {
+          const event = window.document.createEvent("Event");
+          event.initEvent("slideenter", true, true);
+          window.document.dispatchEvent(event);
+        }
+
+        function fireSlideChanged(previousSlide, currentSlide) {
+          fireSlideEnter();
+
+          // dispatch for shiny
+          if (window.jQuery) {
+            if (previousSlide) {
+              window.jQuery(previousSlide).trigger("hidden");
+            }
+            if (currentSlide) {
+              window.jQuery(currentSlide).trigger("shown");
+            }
+          }
+        }
+
+        // hookup for slidy
+        if (window.w3c_slidy) {
+          window.w3c_slidy.add_observer(function (slide_num) {
+            // slide_num starts at position 1
+            fireSlideChanged(null, w3c_slidy.slides[slide_num - 1]);
+          });
+        }
+
+      })();
+    </script>
+
     <script id="quarto-html-after-body" type="application/javascript">
     window.document.addEventListener("DOMContentLoaded", function (event) {
       const toggleBodyColorMode = (bsSheetEl) => {
@@ -795,7 +887,7 @@ Closing files, flushing buffers...done.
           },
           interactive: true,
           interactiveBorder: 10,
-          theme: 'quarto-reveal',
+          theme: 'light-border',
           placement: 'bottom-start'
         };
           config['offset'] = [0,0];
