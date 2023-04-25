@@ -560,6 +560,249 @@ Q = -10log10(e)
 <img data-src="imagenes/calidad.png" class="r-stretch"></section>
 <section id="fastqc" class="slide level2">
 <h2>FastQC</h2>
+<p><br></p>
+<div class="small">
+<ol type="1">
+<li>Activamos el ambiente de conda que tiene instalado el software fastq</li>
+</ol>
+</div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1"></a><span class="ex">conda</span> activate quality</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="small">
+<ol start="2" type="1">
+<li>Listar todos los archivos con terminación .gz. La opción -d permite enlistar rutas completas.</li>
+</ol>
+</div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1"></a><span class="va">files</span><span class="op">=</span><span class="va">$(</span><span class="fu">ls</span> <span class="at">-d</span> ../data/raw_data/morton_data/<span class="pp">*</span>.gz<span class="va">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="small">
+<ol start="3" type="1">
+<li>Para cada archivo de la lista que creamos corre el programa fastq y escribe los resultados en el directorio escogido.</li>
+</ol>
+</div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1"></a><span class="cf">for</span> file <span class="kw">in</span> <span class="va">$files</span></span>
+<span id="cb9-2"><a href="#cb9-2"></a>  <span class="cf">do</span></span>
+<span id="cb9-3"><a href="#cb9-3"></a>    <span class="ex">fastqc</span> <span class="va">$file</span> <span class="at">-o</span> ../outputs/fastqc/morton_data/</span>
+<span id="cb9-4"><a href="#cb9-4"></a><span class="cf">done</span>    </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+
+<aside><div>
+<p><a href="https://www.youtube.com/watch?v=bz93ReOv87Y&amp;ab_channel=BabrahamBioinf">Video Tutorial</a></p>
+</div></aside></section>
+<section id="fastqscreen" class="slide level2">
+<h2>FastQScreen</h2>
+<div class="small">
+<p>Paso 1. Descargar los genomas que sospechemos que pudieran estar presentes en nuestras muestras (Humano, Levadura, Ecoli, Quercus, etc.):</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1"></a><span class="ex">conda</span> activate ncbi_datasets</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Utilizando las herramientas de la linea de comandos de ncbi, descarga los genomas que vamos a poner a prueba</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1"></a><span class="co"># Metadatos de los genomas de referencia disponibles</span></span>
+<span id="cb11-2"><a href="#cb11-2"></a><span class="ex">datasets</span> summary genome taxon <span class="st">'E. coli'</span> <span class="dt">\ </span># entre las comillas se pueden poner nombres comunes o científicos</span>
+<span id="cb11-3"><a href="#cb11-3"></a>    <span class="ex">--assembly-source</span> refseq <span class="dt">\ </span># <span class="er">(</span><span class="ex">--reference</span><span class="kw">)</span> <span class="ex">para</span> ver genomas de referencia </span>
+<span id="cb11-4"><a href="#cb11-4"></a>    <span class="ex">--as-json-lines</span> <span class="kw">|</span> <span class="ex">dataformat</span> tsv genome <span class="dt">\</span></span>
+<span id="cb11-5"><a href="#cb11-5"></a>    <span class="at">--fields</span> accession,assminfo-name,annotinfo-name,annotinfo-release-date,organism-name</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div style="font-size: 18pt;">
+<div class="sourceCode" id="cb12" data-code-line-numbers="false"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="ex">Assembly</span> Accession  Assembly Name   Annotation Name Annotation Release Date Organism Name</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="ex">GCF_000008865.2</span> ASM886v2    Annotation submitted by GIRC    2021-02-12  Escherichia coli O157:H7 str. Sakai</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="ex">GCF_000005845.2</span> ASM584v2    Annotation submitted by Univ. Wisconsin 2013-09-26  Escherichia coli str. K-12 substr. MG1655</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Descargar genoma</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1"></a><span class="ex">datasets</span> download genome accession GCF_000008865.2 <span class="dt">\</span></span>
+<span id="cb13-2"><a href="#cb13-2"></a> <span class="at">--reference</span> <span class="dt">\</span></span>
+<span id="cb13-3"><a href="#cb13-3"></a> <span class="at">--include</span> genome</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="section" class="slide level2">
+<h2></h2>
+<div class="small">
+<p>Paso 2. Indexar los genomas que vamos a poner a prueba con el paquete bowtie2</p>
+<p>Activar ambiente de conda</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1"></a><span class="ex">conda</span> activate mapping</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Index reference genomes to use fastq_screen</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1"></a><span class="bu">cd</span> ../data/genomes/ <span class="co"># ir a directorio donde están las carpetas de cada genoma</span></span>
+<span id="cb15-2"><a href="#cb15-2"></a><span class="va">paths</span><span class="op">=</span><span class="va">$(</span><span class="fu">ls</span> <span class="at">-d</span> <span class="va">$PWD</span>/<span class="pp">*</span><span class="va">)</span> <span class="co"># enlistar todas las carpetas</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Para cada carpeta:</p>
+<ul>
+<li>Enlista los archivos que terminan en .fna y guardalos en la variable file</li>
+<li>Enlista los archivos que terminan en .fna, divide el nombre utilizando el . como separador y quedate con los pedazos 1 y 2</li>
+<li>Entra a la carpeta i</li>
+<li>Genera un indice para el archivo (file) con el nombre que guardamos en la variable name</li>
+</ul>
+<div class="sourceCode" id="cb16"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb16-1"><a href="#cb16-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="va">$paths</span></span>
+<span id="cb16-2"><a href="#cb16-2"></a>  <span class="cf">do</span></span>
+<span id="cb16-3"><a href="#cb16-3"></a>    <span class="va">file</span><span class="op">=</span><span class="va">$(</span><span class="fu">ls</span> <span class="at">-d</span> <span class="va">$i</span>/<span class="pp">*</span>.fna.gz<span class="va">)</span></span>
+<span id="cb16-4"><a href="#cb16-4"></a>    <span class="va">name</span><span class="op">=</span><span class="va">$(</span><span class="fu">ls</span> <span class="va">$i</span>/<span class="pp">*</span>.fna.gz <span class="kw">|</span> <span class="fu">cut</span> <span class="at">-d</span> . <span class="at">-f</span> 1-2<span class="va">)</span></span>
+<span id="cb16-5"><a href="#cb16-5"></a>    <span class="bu">cd</span> <span class="va">$i</span></span>
+<span id="cb16-6"><a href="#cb16-6"></a>    <span class="ex">bowtie2-build</span> <span class="va">$file</span> <span class="va">$name</span></span>
+<span id="cb16-7"><a href="#cb16-7"></a><span class="cf">done</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="section-1" class="slide level2">
+<h2></h2>
+<div class="small">
+<p>Paso 3. Completar nuestro archivo de configuración <code>fastq_screen.conf</code> con las rutas de los programas y de los genomas. Nota: los genomas que queramos utilizar tienen que estar indexados.</p>
+<div class="cell scrollable-chunk">
+<div class="cell-output cell-output-stdout">
+<pre><code> This is a configuration file for fastq_screen
+
+######################
+## Bowtie or Bowtie2 #
+######################
+## If the Bowtie1/2 binary is not in your PATH then you can 
+## set this value to tell the program where to find it.
+## Uncomment the line below and set the appropriate location.
+## Please note, this path should include the executable 
+## filename
+
+#BOWTIE2    /home/szorrilla/bin/bowtie2-2.3.4/bowtie2
+
+
+###########################################
+## Bismark (for bisulfite sequencing only)#
+###########################################
+## If the Bismark binary is not in your PATH then you can 
+## set this value to tell the program where to find it.
+## Uncomment the line below and set the appropriate location.
+## Please note, this path should include the executable 
+## filename.
+
+#BISMARK    /pool/home/szorrilla/bin/bismark/bismark
+
+
+############
+## Threads #
+############
+## Bowtie can be made to run across multiple CPU cores to
+## speed up your searches. Set this value to the number
+## of cores you want to use for your searches.
+
+THREADS     18
+
+##############
+## Databases #
+##############
+## This section allows you to configure multiple databases
+## to search against in your screen. For each database
+## you need to provide a database name (which can't contain
+## spaces) and the location of the bowtie indices which 
+## you created for that database.
+## 
+## The entries shown below are only suggested examples, you 
+## can add as many DATABASE sections as required, and you
+## can comment out or remove as many of the existing entries
+## as desired.
+##
+## Either the original bowtie or bowtie2 may be used for the
+## mapping. Specify the aligner to use with the command line 
+## flag --aligner with arguments 'bowtie' or 
+## 'bowtie2' (default).
+## 
+## The configuration file may list paths to both bowtie and 
+## bowtie2 indices. FastQ Screen automatically detects whether
+## a specified index is compatible with bowtie or bowtie2. 
+##
+## Although the configuration file may list paths to both 
+## bowtie and bowtie2 indices, only one aligner will be used 
+## for the mapping, as specified by the --aligner flag.  
+##
+## The path to the index files SHOULD INCLUDE THE BASENAME of
+## the index, e.g:
+## /data/public/Genomes/Human_Bowtie/GRCh37/Homo_sapiens.GRCh37
+## Thus, the indices (Homo_sapiens.GRCh37.1.bt2, Homo_sapiens.GRCh37.2.bt2, etc.)
+## are found in a folder named 'GRCh37'.
+##
+## If the bowtie AND bowtie2 indices of a given genome reside in the SAME FOLDER,
+## a SINGLE path may be provided to BOTH sets of indices.
+
+## full path /home/szorrilla/Qalba_2022/data/
+## Oak
+DATABASE    Genome  ../data/genomes/qlobata/temp/GCA_001633185.5_ValleyOak3.2_genomic
+#DATABASE   Transcriptome   ../data/Qlobata/Qlobata_2019/Qlobata_transcriptome/Qlobata_transcriptome
+DATABASE    Chloroplast ../data/genomes/qlobata_chloroplast/Qlobata.v3.0.chloroplast
+DATABASE    Mitochondrion   ../data/genomes/qlobata_mitochondrion/Qlobata.v3.0.mitochondrion
+
+
+## Human
+DATABASE    Human   ../data/genomes/human/GCA_000001405.29_GRCh38.p14_genomic
+
+## Yeast
+DATABASE    Yeast   ../data/genomes/yeast/GCA_000146045.2_R64_genomic
+
+## Ecoli
+DATABASE    Ecoli   ../data/genomes/ecoli/GCA_000005845.2_ASM584v2_genomic
+
+## PhiX
+DATABASE    PhiX    ../data/genomes/phix/GCA_002798595.1_ASM279859v1_genomic
+
+## Adapters
+#DATABASE   Adapters    ../data/Other_genomes/Adapters/Adapters</code></pre>
+</div>
+</div>
+</div>
+</section>
+<section id="section-2" class="slide level2">
+<h2></h2>
+<div class="small">
+<p>Paso 4. Correr el programa para cada muestra y escribir los resultados en una carpeta del directorio “outputs”</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb18-1"><a href="#cb18-1"></a><span class="co"># Activamos el ambiente de conda que tiene instalado el software fastq</span></span>
+<span id="cb18-2"><a href="#cb18-2"></a><span class="ex">conda</span> activate quality</span>
+<span id="cb18-3"><a href="#cb18-3"></a><span class="co"># Listar todos los archivos con terminación .gz. La opción -d permite enlistar rutas completas.</span></span>
+<span id="cb18-4"><a href="#cb18-4"></a><span class="va">files</span><span class="op">=</span><span class="va">$(</span><span class="fu">ls</span> <span class="at">-d</span> ../data/raw_data/morton_data/<span class="pp">*</span>.gz<span class="va">)</span></span>
+<span id="cb18-5"><a href="#cb18-5"></a><span class="ex">fastq_screen</span> <span class="at">--threads</span> 10 <span class="at">--aligner</span> bowtie2 <span class="at">--conf</span> fastq_screen.conf <span class="va">$files</span> <span class="at">--outdir</span> ../outputs/fastq_screen/morton_data/</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="multiqc" class="slide level2">
+<h2>MultiQC</h2>
+<p><br></p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb19-1"><a href="#cb19-1"></a><span class="co">## Directories</span></span>
+<span id="cb19-2"><a href="#cb19-2"></a><span class="ex">conda</span> activate quality </span>
+<span id="cb19-3"><a href="#cb19-3"></a></span>
+<span id="cb19-4"><a href="#cb19-4"></a><span class="co"># Ruta del directorio donde están los resultados del fastqc</span></span>
+<span id="cb19-5"><a href="#cb19-5"></a><span class="va">fastqc</span><span class="op">=</span><span class="st">"../outputs/fastqc/morton_data/"</span></span>
+<span id="cb19-6"><a href="#cb19-6"></a></span>
+<span id="cb19-7"><a href="#cb19-7"></a><span class="co"># Ruta del directorio donde están los resultados del fastq_screen</span></span>
+<span id="cb19-8"><a href="#cb19-8"></a><span class="va">fastq_screen</span><span class="op">=</span><span class="st">"../outputs/fastq_screen/morton_data/"</span></span>
+<span id="cb19-9"><a href="#cb19-9"></a></span>
+<span id="cb19-10"><a href="#cb19-10"></a><span class="co">## Command</span></span>
+<span id="cb19-11"><a href="#cb19-11"></a><span class="ex">multiqc</span> <span class="at">--force</span> <span class="at">--interactive</span> <span class="va">$fastqc</span> <span class="va">$fastq_screen</span> <span class="at">--outdir</span> ../outputs/multiqc/morton_data/ </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+
+<aside><div>
+<p><a href="https://multiqc.info/docs/">Manual Multiqc</a></p>
+</div></aside></section>
+<section id="alineamiento-con-un-genoma-de-referencia" class="slide level2">
+<h2>Alineamiento con un genoma de referencia</h2>
+<ol type="1">
+<li>Descargar genoma de referencia (ncbi_datasets)</li>
+<li>Indexar el genoma de referencia con bwa</li>
+</ol>
+<div class="sourceCode" id="cb20"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb20-1"><a href="#cb20-1"></a><span class="co"># Activar el ambiente de conda donde tenemos bwa instalado </span></span>
+<span id="cb20-2"><a href="#cb20-2"></a><span class="ex">conda</span> activate aligner</span>
+<span id="cb20-3"><a href="#cb20-3"></a><span class="co"># indexar genoma </span></span>
+<span id="cb20-4"><a href="#cb20-4"></a><span class="ex">bwa</span> index ../data/Qlobata/GCF_001633185.2_ValleyOak3.2/index/GCF_001633185.2_ValleyOak3.2_genomic.fna</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="section-3" class="slide level2">
+<h2></h2>
+<ol start="3" type="1">
+<li>Alinear cada muestra al genoma de referencia.</li>
+</ol>
+<div class="sourceCode" id="cb21"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb21-1"><a href="#cb21-1"></a><span class="co">## Align to reference genome (Q.lobata) using BWA-MEM</span></span>
+<span id="cb21-2"><a href="#cb21-2"></a></span>
+<span id="cb21-3"><a href="#cb21-3"></a><span class="co">######### read group file suffix</span></span>
+<span id="cb21-4"><a href="#cb21-4"></a><span class="va">file_suffix</span><span class="op">=</span><span class="st">"morton_data2"</span></span>
+<span id="cb21-5"><a href="#cb21-5"></a></span>
+<span id="cb21-6"><a href="#cb21-6"></a><span class="co">######### input data directory</span></span>
+<span id="cb21-7"><a href="#cb21-7"></a><span class="va">folder_data</span><span class="op">=</span><span class="st">"../data/raw_data/morton_data/set2/"</span></span>
+<span id="cb21-8"><a href="#cb21-8"></a></span>
+<span id="cb21-9"><a href="#cb21-9"></a><span class="co">######### output directories</span></span>
+<span id="cb21-10"><a href="#cb21-10"></a><span class="va">out_folder</span><span class="op">=</span><span class="st">"morton_data2"</span></span>
+<span id="cb21-11"><a href="#cb21-11"></a><span class="fu">mkdir</span> <span class="at">-p</span> ../data/alignment/sam/<span class="va">$out_folder</span></span>
+<span id="cb21-12"><a href="#cb21-12"></a><span class="fu">mkdir</span> <span class="at">-p</span> ../data/alignment/bam/<span class="va">$out_folder</span></span>
+<span id="cb21-13"><a href="#cb21-13"></a></span>
+<span id="cb21-14"><a href="#cb21-14"></a><span class="cf">while</span> <span class="bu">read</span> <span class="va">sample</span> <span class="va">readgroup</span></span>
+<span id="cb21-15"><a href="#cb21-15"></a><span class="cf">do</span></span>
+<span id="cb21-16"><a href="#cb21-16"></a>  <span class="bu">echo</span> <span class="st">"bwa mem -M -t 18 -R </span><span class="va">${readgroup}</span><span class="st"> ../data/genomes/qlobata/GCA_001633185.5_ValleyOak3.2_genomic.fna </span><span class="va">${folder_data}</span><span class="st">/</span><span class="va">${sample}</span><span class="st">.fastq.gz &gt; ../data/alignment/sam/</span><span class="va">${out_folder}</span><span class="st">/</span><span class="va">${sample}</span><span class="st">.sam"</span> <span class="kw">|</span> <span class="fu">bash</span></span>
+<span id="cb21-17"><a href="#cb21-17"></a></span>
+<span id="cb21-18"><a href="#cb21-18"></a>  <span class="ex">picard</span> SortSam I=../data/alignment/sam/<span class="va">${out_folder}</span>/<span class="va">${sample}</span>.sam O=../data/alignment/bam/<span class="va">${out_folder}</span>/<span class="va">${sample}</span>.bam SORT_ORDER=coordinate</span>
+<span id="cb21-19"><a href="#cb21-19"></a></span>
+<span id="cb21-20"><a href="#cb21-20"></a>  <span class="ex">samtools</span> index ../data/alignment/bam/<span class="va">${out_folder}</span>/<span class="va">${sample}</span>.bam</span>
+<span id="cb21-21"><a href="#cb21-21"></a></span>
+<span id="cb21-22"><a href="#cb21-22"></a><span class="cf">done</span> <span class="op">&lt;</span> ../data/readgroups/sampl_rgp_<span class="va">${file_suffix}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="footer footer-default">
 <p>Reveal js Quarto</p>
 </div>

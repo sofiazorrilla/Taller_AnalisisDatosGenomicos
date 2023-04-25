@@ -185,7 +185,221 @@ Closing files, flushing buffers...done.
 
 ![](imagenes/calidad.png)
 
-## FastQC
+## FastQC 
+<br>
+
+:::{.small}
+1. Activamos el ambiente de conda que tiene instalado el software fastq 
+:::
+```{.bash}
+conda activate quality
+```
+:::{.small}
+2. Listar todos los archivos con terminación .gz. La opción -d permite enlistar rutas completas.
+:::
+```{.bash}
+files=$(ls -d ../data/raw_data/morton_data/*.gz)
+```
+:::{.small}
+3. Para cada archivo de la lista que creamos corre el programa fastq y escribe los resultados en el directorio escogido.
+:::
+```{.bash}
+for file in $files
+  do
+    fastqc $file -o ../outputs/fastqc/morton_data/
+done	
+```
+::: {.aside}
+[Video Tutorial](https://www.youtube.com/watch?v=bz93ReOv87Y&ab_channel=BabrahamBioinf)
+:::
+
+## FastQScreen
+
+:::{.small}
+Paso 1. Descargar los genomas que sospechemos que pudieran estar presentes en nuestras muestras (Humano, Levadura, Ecoli, Quercus, etc.):
 
 
+ ```{.bash}
+ conda activate ncbi_datasets
+ ```
 
+
+Utilizando las herramientas de la linea de comandos de ncbi, descarga los genomas que vamos a poner a prueba
+
+
+```{.bash}
+# Metadatos de los genomas de referencia disponibles
+datasets summary genome taxon 'E. coli' \ # entre las comillas se pueden poner nombres comunes o científicos
+    --assembly-source refseq \ # (--reference) para ver genomas de referencia 
+    --as-json-lines | dataformat tsv genome \
+    --fields accession,assminfo-name,annotinfo-name,annotinfo-release-date,organism-name
+```
+
+:::{style="font-size: 18pt;"}
+```{.bash code-line-numbers="false"}
+Assembly Accession	Assembly Name	Annotation Name	Annotation Release Date	Organism Name
+GCF_000008865.2	ASM886v2	Annotation submitted by GIRC	2021-02-12	Escherichia coli O157:H7 str. Sakai
+GCF_000005845.2	ASM584v2	Annotation submitted by Univ. Wisconsin	2013-09-26	Escherichia coli str. K-12 substr. MG1655
+```
+:::
+
+
+Descargar genoma
+
+
+```{.bash}
+datasets download genome accession GCF_000008865.2 \
+ --reference \
+ --include genome
+```
+:::
+## 
+
+:::{.small}
+Paso 2. Indexar los genomas que vamos a poner a prueba con el paquete bowtie2
+
+Activar ambiente de conda
+```{.bash}
+conda activate mapping
+```
+Index reference genomes to use fastq_screen
+
+```{.bash}
+cd ../data/genomes/ # ir a directorio donde están las carpetas de cada genoma
+paths=$(ls -d $PWD/*) # enlistar todas las carpetas
+```
+
+Para cada carpeta:
+
+- Enlista los archivos que terminan en .fna y guardalos en la variable file 
+- Enlista los archivos que terminan en .fna, divide el nombre utilizando el . como separador y quedate con los pedazos 1 y 2
+- Entra a la carpeta i 
+- Genera un indice para el archivo (file) con el nombre que guardamos en la variable name 
+
+```{.bash}
+for i in $paths
+  do
+    file=$(ls -d $i/*.fna.gz)
+    name=$(ls $i/*.fna.gz | cut -d . -f 1-2)
+    cd $i
+    bowtie2-build $file $name
+done
+```
+:::
+
+##
+:::{.small}
+Paso 3. Completar nuestro archivo de configuración `fastq_screen.conf` con las rutas de los programas y de los genomas. Nota: los genomas que queramos utilizar tienen que estar indexados. 
+
+```{r}
+#| echo: false
+#| class: scrollable-chunk
+cat(readLines('../inputs/fastq_screen/fastq_screen.conf'), sep = '\n')
+```
+:::
+
+##
+
+:::{.small}
+Paso 4. Correr el programa para cada muestra y escribir los resultados en una carpeta del directorio "outputs"
+
+```{.bash}
+# Activamos el ambiente de conda que tiene instalado el software fastq
+conda activate quality
+# Listar todos los archivos con terminación .gz. La opción -d permite enlistar rutas completas.
+files=$(ls -d ../data/raw_data/morton_data/*.gz)
+fastq_screen --threads 10 --aligner bowtie2 --conf fastq_screen.conf $files --outdir ../outputs/fastq_screen/morton_data/
+```
+:::
+
+## MultiQC
+
+<br>
+
+```{.bash}
+## Directories
+conda activate quality 
+
+# Ruta del directorio donde están los resultados del fastqc
+fastqc="../outputs/fastqc/morton_data/"
+
+# Ruta del directorio donde están los resultados del fastq_screen
+fastq_screen="../outputs/fastq_screen/morton_data/"
+
+## Command
+multiqc --force --interactive $fastqc $fastq_screen --outdir ../outputs/multiqc/morton_data/ 
+```
+
+::: aside
+[Manual Multiqc](https://multiqc.info/docs/)
+:::
+
+## Alineamiento con un genoma de referencia 
+
+1. Descargar genoma de referencia (ncbi_datasets)
+2. Indexar el genoma de referencia con bwa
+
+```{.bash}
+# Activar el ambiente de conda donde tenemos bwa instalado 
+conda activate aligner
+# indexar genoma 
+bwa index ../data/Qlobata/GCF_001633185.2_ValleyOak3.2/index/GCF_001633185.2_ValleyOak3.2_genomic.fna
+```
+
+##
+
+3. Alinear cada muestra al genoma de referencia. 
+
+```{.bash}
+## Align to reference genome (Q.lobata) using BWA-MEM
+
+######### read group file suffix
+file_suffix="morton_data2"
+
+######### input data directory
+folder_data="../data/raw_data/morton_data/set2/"
+
+######### output directories
+out_folder="morton_data2"
+mkdir -p ../data/alignment/sam/$out_folder
+mkdir -p ../data/alignment/bam/$out_folder
+
+while read sample readgroup
+do
+  echo "bwa mem -M -t 18 -R ${readgroup} ../data/genomes/qlobata/GCA_001633185.5_ValleyOak3.2_genomic.fna ${folder_data}/${sample}.fastq.gz > ../data/alignment/sam/${out_folder}/${sample}.sam" | bash
+
+  picard SortSam I=../data/alignment/sam/${out_folder}/${sample}.sam O=../data/alignment/bam/${out_folder}/${sample}.bam SORT_ORDER=coordinate
+
+  samtools index ../data/alignment/bam/${out_folder}/${sample}.bam
+
+done < ../data/readgroups/sampl_rgp_${file_suffix}
+```
+
+## Llamado de SNPs
+
+- [Manual stacks](https://catchenlab.life.illinois.edu/stacks/manual/)
+
+- [Flujo de trabajo detallado con stacks](https://doi.org/10.1111/2041-210X.12775)
+
+- [de novo](https://cran.r-project.org/web/packages/RADstackshelpR/vignettes/reproducible.vignette.html)
+
+```{.bash}
+# Activar ambiente de conda
+conda activate stacks
+```
+
+The 2 steps performed in ref_map.pl are:
+
+- gstacks which will identify SNPs within the meta population for each locus and then genotype each individual at each identified SNP. Once SNPs have been identified and genotyped, gstacks will phase the SNPs at each locus, in each individual, into a set of haplotypes
+
+- populations which will will analyze a population of individual samples computing a number of population genetics statistics as well as exporting a variety of standard output formats. 
+
+```{.bash}
+out_dir="../data/vcf/unfiltered/stacks_output/all.90"
+popmap="../data/sample_metadata/all_morton_popmap"
+input_dir="../data/alignment/bam/all.90/"
+
+mkdir -p $out_dir
+
+ref_map.pl -o $out_dir -T 18 --popmap $popmap --samples $input_dir -X "populations:--ordered-export --vcf --phylip"
+```
