@@ -2,7 +2,7 @@
 Taller de introducción a análisis de datos con datos genómicos para el seminario 2023 del laboratorio de Biología Neotropical
 
 ## Presentaciones 
-[Ejercicio 1](https://github.com/sofiazorrilla/Taller_AnalisisDatosGenomicos/blob/eea51b4b6e4011db9201c8333b36efcdb411d4d7/Presentacion/Ejercicio1.html)
+[Ejercicio 1](https://sofiazorrilla.github.io/Taller_AnalisisDatosGenomicos/Presentacion/Ejercicio1.html)
 
 
 ## Recursos
