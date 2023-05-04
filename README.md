@@ -4,6 +4,7 @@ Taller de introducción a análisis de datos con datos genómicos para el semina
 ## Presentaciones 
 [Ejercicio 1](https://github.com/sofiazorrilla/Taller_AnalisisDatosGenomicos/blob/eea51b4b6e4011db9201c8333b36efcdb411d4d7/Presentacion/Ejercicio1.html)
 
+
 ## Recursos
 
 **Git con Rstudio**
